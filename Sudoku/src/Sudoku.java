@@ -1,3 +1,5 @@
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
+
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +10,8 @@ import java.util.List;
 public class Sudoku {
 
     //TODO: Test setCandidates and helper methods
-    //TODO: Fix convertToArray file reading problem and type of return (initialize SingleBoxes)
+    //TODO: Fix convertToArray file reading problem
+    //TODO: Make method updateCandidates that deletes the new final number from every affected row, col and box
     //TODO: implement solve method with rules
     //TODO: Add comments and javadocs
     //TODO: Add graphics if time
@@ -23,22 +26,32 @@ public class Sudoku {
         grid = convertToArray(filename);
     }
 
-    //this now needs to convert to a grid of single boxes objects
     public SingleBox[][] convertToArray(String filename){
-        int cur;
-        int[][] array = new int[SIZE][SIZE];
+        byte cur;
+        int input;
+        SingleBox box;
+        SingleBox[][] array = new SingleBox[SIZE][SIZE];
         int countX = 0;
         int countY = 0;
         try{
             Reader reader = new BufferedReader(new FileReader(filename));
-            while((cur = reader.read()) != -1) {
-                array[countX][countY] = cur;
+            while(countX<9) {
+                cur = (byte)reader.read();
+                System.out.println("Cur before convert" + cur);
+                input = cur & 0xFF;
+                System.out.println("Cur after convert" + cur);
+                box = new SingleBox(input);
+                //System.out.println("cur= "+ cur);
+                System.out.println("CountX= "+ countX);
+                System.out.println("CountY= "+ countY);
+                array[countX][countY] = box;
                 if (countY == SIZE - 1) {
                     countY = 0;
                     countX++;
                 } else {
                     countY++;
                 }
+
             }
         }
         catch(FileNotFoundException ex){
@@ -50,7 +63,6 @@ public class Sudoku {
         return array;
     }
 
-    //TODO: add loops!
     private void setCandidates(){
         for(int i=0; i<SIZE; i++){
             setRoworCol(i, true);
