@@ -10,7 +10,7 @@ import java.util.List;
 public class Sudoku {
 
     //TODO: Test setCandidates and helper methods
-    //TODO: Fix convertToArray file reading problem
+    //TODO: Fix convertToArray number/byte conversion problem
     //TODO: Make method updateCandidates that deletes the new final number from every affected row, col and box
     //TODO: implement solve method with rules
     //TODO: Add comments and javadocs
@@ -122,6 +122,109 @@ public class Sudoku {
             grid[index[0]][index[1]].removeCandidates(finals);
         }
     }
+
+    /** when a new final number is created this method crosses off that number from the candidate lists
+     * of SingleBoxes in the same row column and box
+     * @param num
+     * @param row
+     * @param col
+     */
+    private void updatecandidates(Integer num, int row, int col){
+        for(int i=0; i<SIZE; i++){
+            List<Integer>candidateList1=grid[row][i].getCandidates();
+            List<Integer>candidateList2=grid[i][col].getCandidates();
+
+            if (!grid[row][i].isFinal() && candidateList1.contains(num)){
+                candidateList1.remove(num);
+            }
+            if(!grid[i][col].isFinal() && candidateList2.contains(num)){
+                candidateList2.remove(num);
+            }
+        }
+        //box
+        int startRow= row/BOX_SIZE;
+        int startCol= col/BOX_SIZE;
+        for(int i=startRow; i<startRow+BOX_SIZE; i++){
+            for(int j=startCol; j<startCol+BOX_SIZE; j++){
+                List<Integer>candidateList3=grid[i][j].getCandidates();
+                if(!grid[i][j].isFinal() && candidateList3.contains(num)){
+                    candidateList3.remove(num);
+                }
+            }
+        }
+    }
+    private void nakedSingle(int row, int col){
+        SingleBox curr = grid[row][col];
+        if(!curr.isFinal() && curr.getCandidates().size()==1){
+            curr.setNumber(curr.getCandidates().get(0));
+            curr.setFinal(true);
+        }
+    }
+
+    //possible that this should work more similarly to the naked single method
+    private void hiddenSingleRow(int row){
+        List<Integer> posHiddenSingles= new LinkedList<>();
+        for(int i=0; i<SIZE; i++){
+            if(!grid[row][i].isFinal()){
+                for(Integer candidate: grid[row][i].getCandidates()){
+                    if(posHiddenSingles.contains(candidate)){
+                        posHiddenSingles.remove(candidate);
+                    }else{
+                        posHiddenSingles.add(candidate);
+                    }
+
+                }
+            }
+        }
+        if(posHiddenSingles.size()==1){
+            //TODO: finish this
+            //there is one
+            //find the one with the value stored in posHiddenSingles
+            //set it's final to that value
+            //updateCandidates
+        }
+    }
+    //TODO: make these work for columns and boxes
+
+    private void nakedPair(int row){
+        for(int i=0; i<SIZE; i++){
+            SingleBox curr = grid[row][i];
+            if(!curr.isFinal() && curr.getCandidates().size()==2){
+                //check if there is another SingleBox with the same Candidate list
+                for(int j=i+1; j<SIZE;j++){
+                    SingleBox check = grid[row][j];
+                    if(!check.isFinal() && check.getCandidates().equals(curr.getCandidates())){//found it
+                        for(int k=0; k<SIZE; k++){//now remove other instances of these candidates
+                            if(k!=i || k!=j){//ensures we don't remove from the nakedPair
+                                grid[row][k].removeCandidates(curr.getCandidates());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * finds a hiddenPair if there is one and removes all other candidates from the pair's lists
+     * @param row
+     */
+    private void hiddenPairRow(int row){
+
+    }
+    //this is unfinished I simply started thinking about how this loop might look
+    public void solve(){
+        setCandidates();
+        boolean done = false;
+        while(!done){
+            for(int i=0; i<SIZE; i++){
+                for(int j=0; j<SIZE; j++){
+                    nakedSingle(i,j);
+                }
+            }
+        }
+    }
+
 
 
 }

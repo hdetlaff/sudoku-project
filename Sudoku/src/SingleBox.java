@@ -24,6 +24,12 @@ public class SingleBox {
             isFinal = false;
     }
 
+    public void setFinal(boolean fin){
+        isFinal = fin;
+    }
+    public void setNumber(int num){
+        number = num;
+    }
     public void setCandidates(List<Integer> nums){
         candidates = nums;
     }
